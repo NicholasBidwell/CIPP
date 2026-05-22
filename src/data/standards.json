@@ -8757,5 +8757,41 @@
     "recommendedBy": [
       "Huntress SAT setup guide"
     ]
+  },
+  {
+    "name": "standards.SatMailboxForwarding",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Mailbox Forwarding"
+    ],
+    "helpText": "Wires the SAT shared mailbox (default phishing@<default-domain>) to forward all messages to the Huntress mail contact (default report@phish.mycurricula.com) via the directory ForwardingAddress field. Clears any pre-existing raw SMTP forward. Depends on the DeployMailContact and SatSharedMailbox standards having run first.",
+    "docsDescription": "Sets the ForwardingAddress property on the SAT shared mailbox to point at the Huntress mail contact (directory link, NOT raw SMTP). Simultaneously nulls ForwardingSmtpAddress so older configurations don't conflict. Sets DeliverToMailboxAndForward according to the configured switch (default true \u2014 keep audit trail in the mailbox). Requires the contact and shared mailbox to already exist; depends on the DeployMailContact and SatSharedMailbox standards having run first. Idempotent: re-running on an already-correct mailbox logs and does nothing.",
+    "executiveText": "Connects the internal phishing-report mailbox to the security training vendor so user-reported emails automatically reach the vendor's analysis pipeline. A copy stays in the local mailbox for audit purposes.",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatMailboxForwarding.mailboxAlias",
+        "label": "Shared mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatMailboxForwarding.contactExternalEmail",
+        "label": "Contact ExternalEmailAddress to forward to \u2014 defaults to 'report@phish.mycurricula.com'"
+      },
+      {
+        "type": "switch",
+        "name": "standards.SatMailboxForwarding.deliverToMailboxAndForward",
+        "label": "Keep a copy in the shared mailbox (DeliverToMailboxAndForward) \u2014 recommended"
+      }
+    ],
+    "label": "Huntress SAT - mailbox forwarding to phishing-report contact",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-22",
+    "powerShellEquivalent": "Set-Mailbox -Identity 'phishing@<default-domain>' -ForwardingAddress <ContactIdentity> -ForwardingSmtpAddress $null -DeliverToMailboxAndForward $true",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
   }
 ]
