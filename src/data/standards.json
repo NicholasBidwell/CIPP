@@ -8639,5 +8639,123 @@
     "recommendedBy": [
       "CIS"
     ]
+  },
+  {
+    "name": "standards.SatRemoteDomain",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Phishing Simulation Allowlist"
+    ],
+    "helpText": "Creates / maintains a named RemoteDomain (default phish.mycurricula.com) with AutoForwardEnabled=$true so the SAT reporting destination is exempt from tenant-wide external-forwarding blocks. Required when the Default RemoteDomain has AutoForwardEnabled=$false (recommended Huntress ISPM configuration) \u2014 named remote domains are out-of-scope from that enforcement.",
+    "docsDescription": "Ensures a named Exchange Online RemoteDomain exists for the Huntress SAT reporting destination with AutoForwardEnabled=$true. Idempotent: if the named domain already exists with the desired state, the standard logs and does nothing. If it exists with AutoForwardEnabled=$false, the standard updates it. If it doesn't exist, the standard creates it. The tenant-wide block on external auto-forwarding (enforced via the Default RemoteDomain) remains in effect for every destination except the one this standard manages.",
+    "executiveText": "Creates a small Exchange Online exception that permits auto-forwarding to a specific external phishing-reporting destination. The tenant-wide block on external auto-forwarding remains in effect for all other destinations.",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatRemoteDomain.domainName",
+        "label": "Remote domain to allow (DomainName) \u2014 defaults to phish.mycurricula.com"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatRemoteDomain.remoteDomainName",
+        "label": "Friendly name (Name) \u2014 optional, auto-derived if blank"
+      }
+    ],
+    "label": "Huntress SAT - named RemoteDomain (AutoForwardEnabled)",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-22",
+    "powerShellEquivalent": "New-RemoteDomain -Name 'Huntress SAT (phish.mycurricula.com)' -DomainName 'phish.mycurricula.com'; Set-RemoteDomain -Identity 'Huntress SAT (phish.mycurricula.com)' -AutoForwardEnabled $true",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
+  },
+  {
+    "name": "standards.SatSharedMailbox",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Phishing Reporting"
+    ],
+    "helpText": "Creates the phishing-report shared mailbox (default phishing@<tenant-default-domain>) used as the destination for the Outlook Report button and the forward target for end-user reports. Hidden from the GAL by default. Idempotent \u2014 re-applies the hide-from-GAL flag to a pre-existing mailbox.",
+    "docsDescription": "Creates a Shared Mailbox at the configured alias on the tenant's default accepted domain. Used by Huntress SAT setup as the central inbox for user-reported phishing. By default the mailbox is hidden from the Global Address List so end users don't see it as a contactable recipient. If a mailbox already exists at the target address, the standard does NOT recreate it \u2014 it only ensures HiddenFromAddressListsEnabled is set when configured to true. The standard will NOT convert a non-shared mailbox in place; manual intervention required in that case (logged as a warning).",
+    "executiveText": "Provisions a central inbox used by end users to report phishing emails. The mailbox is hidden from address lists so end users don't see it as a directory contact, but they reach it via the Outlook Report button or by forwarding suspicious messages.",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatSharedMailbox.alias",
+        "label": "Mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatSharedMailbox.displayName",
+        "label": "Display name \u2014 defaults to 'Report Phishing'"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatSharedMailbox.firstName",
+        "label": "First name \u2014 defaults to '911'"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatSharedMailbox.lastName",
+        "label": "Last name \u2014 defaults to 'email'"
+      },
+      {
+        "type": "switch",
+        "name": "standards.SatSharedMailbox.hideFromGal",
+        "label": "Hide from Global Address List (recommended)"
+      }
+    ],
+    "label": "Huntress SAT - phishing-report shared mailbox",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-22",
+    "powerShellEquivalent": "New-Mailbox -Shared -Name 'Report Phishing' -Alias 'phishing' -PrimarySmtpAddress 'phishing@<defaultdomain>' -FirstName '911' -LastName 'email'; Set-Mailbox -Identity 'phishing@<defaultdomain>' -HiddenFromAddressListsEnabled $true",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
+  },
+  {
+    "name": "standards.SatOutboundForwardingAllow",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Outbound Spam Filter"
+    ],
+    "helpText": "Creates a custom HostedOutboundSpamFilterPolicy + Rule that permits auto-forwarding (AutoForwardingMode=On) for one specific sender (default phishing@<default-domain>). Lets the SAT reporting mailbox forward while the Default outbound spam policy remains AutoForwardingMode=Off (Huntress ISPM enforcement).",
+    "docsDescription": "Microsoft's secure-by-default hardening, and tools like Huntress ISPM, force the Default Hosted Outbound Spam Filter Policy to AutoForwardingMode=Off, which blocks ALL external auto-forwarding tenant-wide. This standard creates a *named* policy at priority 0 (highest) scoped to a single sender via the From parameter, with AutoForwardingMode=On. Outbound spam rule resolution matches the highest-priority sender rule first, so the SAT reporting mailbox can auto-forward while all other senders remain blocked by the Default. Idempotent: existing policy/rule are detected and updated rather than recreated. Re-binding a rule to its already-associated policy is intentionally avoided on the Set path (EXO rejects re-binding).",
+    "executiveText": "Creates a narrow exception in the outbound mail filter so the phishing-report mailbox can forward reported emails to the security training vendor. All other mailboxes remain subject to the tenant-wide block on external auto-forwarding.",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatOutboundForwardingAllow.senderAddress",
+        "label": "Sender SMTP address to allow (blank = auto-derive to phishing@<default-domain>)"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatOutboundForwardingAllow.policyName",
+        "label": "Custom outbound spam policy name"
+      },
+      {
+        "type": "textField",
+        "name": "standards.SatOutboundForwardingAllow.ruleName",
+        "label": "Custom outbound spam rule name"
+      },
+      {
+        "type": "number",
+        "name": "standards.SatOutboundForwardingAllow.priority",
+        "label": "Rule priority (0 = highest, overrides Default policy first)"
+      }
+    ],
+    "label": "Huntress SAT - scoped outbound auto-forwarding allow",
+    "impact": "Medium Impact",
+    "impactColour": "warning",
+    "addedDate": "2026-05-22",
+    "powerShellEquivalent": "New-HostedOutboundSpamFilterPolicy -Name 'Huntress SAT - Allow Auto Forwarding' -AutoForwardingMode On; New-HostedOutboundSpamFilterRule -Name 'Huntress SAT - Allow Auto Forwarding' -HostedOutboundSpamFilterPolicy 'Huntress SAT - Allow Auto Forwarding' -From 'phishing@<default-domain>' -Priority 0",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
   }
 ]
