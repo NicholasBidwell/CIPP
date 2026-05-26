@@ -8654,12 +8654,14 @@
       {
         "type": "textField",
         "name": "standards.SatRemoteDomain.domainName",
-        "label": "Remote domain to allow (DomainName) \u2014 defaults to phish.mycurricula.com"
+        "label": "Remote domain to allow (DomainName) \u2014 defaults to phish.mycurricula.com",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatRemoteDomain.remoteDomainName",
-        "label": "Friendly name (Name) \u2014 optional, auto-derived if blank"
+        "label": "Friendly name (Name) \u2014 optional, auto-derived if blank",
+        "required": false
       }
     ],
     "label": "Huntress SAT - named RemoteDomain (AutoForwardEnabled)",
@@ -8685,22 +8687,26 @@
       {
         "type": "textField",
         "name": "standards.SatSharedMailbox.alias",
-        "label": "Mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'"
+        "label": "Mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatSharedMailbox.displayName",
-        "label": "Display name \u2014 defaults to 'Report Phishing'"
+        "label": "Display name \u2014 defaults to 'Report Phishing'",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatSharedMailbox.firstName",
-        "label": "First name \u2014 defaults to '911'"
+        "label": "First name \u2014 defaults to '911'",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatSharedMailbox.lastName",
-        "label": "Last name \u2014 defaults to 'email'"
+        "label": "Last name \u2014 defaults to 'email'",
+        "required": false
       },
       {
         "type": "switch",
@@ -8731,22 +8737,26 @@
       {
         "type": "textField",
         "name": "standards.SatOutboundForwardingAllow.senderAddress",
-        "label": "Sender SMTP address to allow (blank = auto-derive to phishing@<default-domain>)"
+        "label": "Sender SMTP address to allow (blank = auto-derive to phishing@<default-domain>)",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatOutboundForwardingAllow.policyName",
-        "label": "Custom outbound spam policy name"
+        "label": "Custom outbound spam policy name",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatOutboundForwardingAllow.ruleName",
-        "label": "Custom outbound spam rule name"
+        "label": "Custom outbound spam rule name",
+        "required": false
       },
       {
         "type": "number",
         "name": "standards.SatOutboundForwardingAllow.priority",
-        "label": "Rule priority (0 = highest, overrides Default policy first)"
+        "label": "Rule priority (0 = highest, overrides Default policy first)",
+        "required": false
       }
     ],
     "label": "Huntress SAT - scoped outbound auto-forwarding allow",
@@ -8772,12 +8782,14 @@
       {
         "type": "textField",
         "name": "standards.SatMailboxForwarding.mailboxAlias",
-        "label": "Shared mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'"
+        "label": "Shared mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'",
+        "required": false
       },
       {
         "type": "textField",
         "name": "standards.SatMailboxForwarding.contactExternalEmail",
-        "label": "Contact ExternalEmailAddress to forward to \u2014 defaults to 'report@phish.mycurricula.com'"
+        "label": "Contact ExternalEmailAddress to forward to \u2014 defaults to 'report@phish.mycurricula.com'",
+        "required": false
       },
       {
         "type": "switch",
