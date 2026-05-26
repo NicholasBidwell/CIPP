@@ -8805,5 +8805,91 @@
     "recommendedBy": [
       "Huntress SAT setup guide"
     ]
+  },
+  {
+    "name": "standards.SatUserSubmissions",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Phishing Reporting"
+    ],
+    "helpText": "Multi-tenant wrapper for the Outlook user-submission feature. Routes the built-in Report button to <alias>@<tenant-default-domain> (auto-derived per tenant) with Huntress-recommended settings: no copy sent to Microsoft, no pre-submit confirmation dialog, quarantine reporting disabled. Use in place of the upstream UserSubmissions standard for multi-tenant Huntress SAT deployments.",
+    "docsDescription": "Configures DefaultReportSubmissionPolicy + DefaultReportSubmissionRule for the built-in Outlook Report button. Auto-derives the destination email to <mailboxAlias>@<tenant-default-domain> so the same standard config can be applied across all tenants without per-tenant text edits. Mirrors the upstream UserSubmissions standard but adds tenant-aware default + bakes in the Huntress drift fixes (EnableReportToMicrosoft=false, PreSubmitMessageEnabled=false, DisableQuarantineReportingOption=true). Idempotent.",
+    "executiveText": "Enables the built-in Outlook Report button and routes user-reported messages to the per-tenant phishing@<domain> mailbox. Prevents Microsoft from receiving a copy and re-scanning the message (which triggers recurring Huntress training emails for the reporting user).",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatUserSubmissions.mailboxAlias",
+        "label": "Mailbox alias (local part of SMTP) \u2014 defaults to 'phishing'",
+        "required": false
+      },
+      {
+        "type": "switch",
+        "name": "standards.SatUserSubmissions.enableReportToMicrosoft",
+        "label": "Also send reports to Microsoft (NOT recommended \u2014 triggers re-scan + recurring training)"
+      }
+    ],
+    "label": "Huntress SAT - Outlook Report button (auto-derived destination)",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-26",
+    "powerShellEquivalent": "Set-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy -EnableReportToMicrosoft $false -ReportPhishAddresses 'phishing@<default-domain>' -PreSubmitMessageEnabled $false -DisableQuarantineReportingOption $true",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
+  },
+  {
+    "name": "standards.SatSpamFilterAllow",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Anti-Spam Allowlist"
+    ],
+    "helpText": "Additive merge \u2014 adds the 23 Huntress SAT sender domains to a HostedContentFilterPolicy's AllowedSenderDomains. Does NOT touch any other policy settings. Use this for multi-tenant rollouts where you only want to add the Huntress allowlist without owning the rest of the policy.",
+    "docsDescription": "Uses @{Add=...} syntax to append Huntress's 23 sender domains to the target HostedContentFilterPolicy's AllowedSenderDomains without touching action thresholds, quarantine settings, bulk mail level, or any other policy values. Defaults to the tenant's Default policy. Idempotent \u2014 Set-HostedContentFilterPolicy silently dedupes when adding entries that already exist. The canonical 23-domain list lives in _SatHuntressLists.ps1 alongside this module.",
+    "executiveText": "Allows the security training vendor's phishing simulation emails through the spam filter without weakening any other anti-spam protection on the tenant.",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatSpamFilterAllow.policyIdentity",
+        "label": "Anti-spam policy Identity to modify \u2014 defaults to 'Default'",
+        "required": false
+      }
+    ],
+    "label": "Huntress SAT - merge bait domains into anti-spam policy",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-26",
+    "powerShellEquivalent": "Set-HostedContentFilterPolicy -Identity 'Default' -AllowedSenderDomains @{Add='mycurricula.com','alerts.mycurricula.com',...}",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
+  },
+  {
+    "name": "standards.SatSafeLinksExclusion",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Safe Links"
+    ],
+    "helpText": "Additive merge \u2014 adds the 23 Huntress SAT bait URL globs to one or all custom Safe Links policies' DoNotRewriteUrls. Does NOT touch other policy settings. Use this for multi-tenant rollouts where you only want to add the Huntress exclusion without owning the rest of the policy. Tenants on Defender preset (Standard/Strict) only will log a warning and skip \u2014 rely on the transport-rule SkipSafeLinks bypass instead.",
+    "docsDescription": "Uses @{Add=...} syntax to append Huntress's 23 bait domain URL globs (e.g. mycurricula.com/*) to the target SafeLinksPolicy's DoNotRewriteUrls without touching any other policy values. If a policyName is not specified, applies to every custom (non-preset) Safe Links policy in the tenant. Defender Standard/Strict preset policies are excluded automatically (IsBuiltInProtection=true) since preset DoNotRewriteUrls edits silently no-op. The canonical 23-URL-glob list lives in _SatHuntressLists.ps1 alongside this module. Idempotent.",
+    "executiveText": "Prevents Microsoft Safe Links from rewriting or detonating the security training vendor's phishing-simulation URLs. Other URL protection on the tenant continues unchanged.",
+    "addedComponent": [
+      {
+        "type": "textField",
+        "name": "standards.SatSafeLinksExclusion.policyName",
+        "label": "Specific Safe Links policy name \u2014 blank applies to all custom (non-preset) policies",
+        "required": false
+      }
+    ],
+    "label": "Huntress SAT - merge bait URLs into custom SafeLinks DoNotRewriteUrls",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-26",
+    "powerShellEquivalent": "Set-SafeLinksPolicy -Identity '<custom policy>' -DoNotRewriteUrls @{Add='mycurricula.com/*','alerts.mycurricula.com/*',...}",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
   }
 ]
