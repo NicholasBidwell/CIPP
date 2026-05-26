@@ -8891,5 +8891,31 @@
     "recommendedBy": [
       "Huntress SAT setup guide"
     ]
+  },
+  {
+    "name": "standards.SatPhishSimUrls",
+    "cat": "Exchange Standards",
+    "tag": [
+      "Huntress SAT",
+      "Advanced Delivery"
+    ],
+    "helpText": "Adds the 18 Huntress SAT bait URL globs to the tenant's Advanced Delivery URL allowlist, one URL at a time so Microsoft rejecting any individual entry doesn't block the rest. Use INSTEAD of the upstream PhishingSimulations' URL-add functionality (which is bulk all-or-nothing). Keep upstream PhishingSimulations enabled for the policy + rule creation.",
+    "docsDescription": "The upstream PhishingSimulations standard adds Phishing Simulation URLs via a single bulk New-TenantAllowBlockListItems call. If Microsoft's validation rejects any one URL (returning 'Invalid value to add: X - Not a valid domain.'), the entire bulk operation fails atomically and zero URLs are added. This standard performs per-URL adds, catching rejections individually and continuing with the rest. The canonical 18-URL list lives in _SatHuntressLists.ps1 \u2014 single source of truth across cipp-custom-standards. Idempotent \u2014 reads current TABL state first, only attempts to add missing entries. Pairs with native PhishingSimulations (which still creates the override policy + rule).",
+    "executiveText": "Adds Huntress's phishing-simulation URLs to Microsoft's Advanced Delivery allowlist so click-tracking URLs in simulation emails reach the recipient without detonation. Per-URL retry handles cases where Microsoft rejects specific domains.",
+    "addedComponent": [
+      {
+        "type": "switch",
+        "name": "standards.SatPhishSimUrls.failOnAnyRejection",
+        "label": "Fail the standard if any URL is rejected (default off: continue with the rest)"
+      }
+    ],
+    "label": "Huntress SAT - Phishing Simulation URL allowlist (per-URL retry)",
+    "impact": "Low Impact",
+    "impactColour": "info",
+    "addedDate": "2026-05-26",
+    "powerShellEquivalent": "foreach ($u in @('amazonsecurity.org/*',...)) { try { New-TenantAllowBlockListItems -ListType Url -ListSubType AdvancedDelivery -Entries @($u) -Allow -NoExpiration } catch { Write-Warning \"Rejected: $u - $_\" } }",
+    "recommendedBy": [
+      "Huntress SAT setup guide"
+    ]
   }
 ]
